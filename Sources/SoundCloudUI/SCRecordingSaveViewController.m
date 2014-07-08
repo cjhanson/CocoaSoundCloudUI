@@ -800,7 +800,7 @@ const NSArray *allServices = nil;
     
     CGSize textSize = [text sizeWithFont:[UIFont systemFontOfSize:15.0]
                        constrainedToSize:CGSizeMake(CGRectGetWidth(self.tableView.bounds) - 2 * [self cellMargin], CGFLOAT_MAX)
-                           lineBreakMode:UILineBreakModeWordWrap];
+                           lineBreakMode:NSLineBreakByWordWrapping];
     
     UIView *sectionHeaderView = [[[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, CGRectGetWidth(self.tableView.bounds) - 2 * [self cellMargin], textSize.height + 2 * 10.0)] autorelease];
     sectionHeaderView.backgroundColor = [UIColor clearColor];
@@ -826,7 +826,7 @@ const NSArray *allServices = nil;
     
     CGSize textSize = [text sizeWithFont:[UIFont systemFontOfSize:15.0]
                        constrainedToSize:CGSizeMake(CGRectGetWidth(self.tableView.bounds) - 2 * [self cellMargin], CGFLOAT_MAX)
-                           lineBreakMode:UILineBreakModeWordWrap];
+                           lineBreakMode:NSLineBreakByWordWrapping];
     
     return textSize.height + 2 * 10.0;
 }
@@ -1320,13 +1320,19 @@ const NSArray *allServices = nil;
                                               onResource:[NSURL URLWithString:@"https://api.soundcloud.com/tracks.json"]
                                          usingParameters:parameters
                                              withAccount:self.account
-                                  sendingProgressHandler:^(unsigned long long bytesSend, unsigned long long bytesTotal){self.uploadProgressView.progress.progress = (float)bytesSend / bytesTotal;}
+                                  sendingProgressHandler:^(unsigned long long bytesSend, unsigned long long bytesTotal){
+                                      bytesTotal = MAX(1, bytesTotal);
+                                      self.uploadProgressView.progress.progress = (float)bytesSend / bytesTotal;
+                                  }
                                          responseHandler:^(NSURLResponse *response, NSData *data, NSError *error){
                                              
                                              self.uploadRequestHandler = nil;
                                              
+                                             id result = nil;
                                              NSError *jsonError = nil;
-                                             id result = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
+                                             if([data length] > 0){
+                                                 result = [NSJSONSerialization JSONObjectWithData:data options:0 error:&jsonError];
+                                             }
                                              
                                              if (error || jsonError || result == nil) {
                                                  
