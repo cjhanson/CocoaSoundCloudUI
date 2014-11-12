@@ -37,7 +37,7 @@
 + (UIImage *)imageWithColor:(UIColor *)color size:(CGSize)size;
 {
 	CGRect rect = CGRectMake(0.0f, 0.0f, size.width, size.height);
-    UIGraphicsBeginImageContext(size);
+    UIGraphicsBeginImageContextWithOptions(size, NO, 0.0);
     CGContextRef context = UIGraphicsGetCurrentContext();
 	
     CGContextSetFillColorWithColor(context, [color CGColor]);
@@ -51,7 +51,7 @@
 
 - (UIImage *)imageByResizingTo:(CGSize)newSize;
 {
-	UIGraphicsBeginImageContext(newSize);
+	UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
     [self drawInRect:CGRectMake(0.0f, 0.0f, newSize.width, newSize.height)];
 	UIImage* scaledImage = UIGraphicsGetImageFromCurrentImageContext();
 	UIGraphicsEndImageContext();
@@ -60,15 +60,7 @@
 
 - (UIImage *)imageByResizingTo:(CGSize)newSize forRetinaDisplay:(BOOL)forRetinaDisplay;
 {
-    if (forRetinaDisplay && [[UIScreen mainScreen] respondsToSelector:@selector(scale)]) {
-        if ([[UIScreen mainScreen] scale] == 2.0) {
-            UIGraphicsBeginImageContextWithOptions(newSize, YES, 2.0);
-        } else {
-            UIGraphicsBeginImageContext(newSize);
-        }
-    } else {
-        UIGraphicsBeginImageContext(newSize);
-    }
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
     [self drawInRect:CGRectMake(0.0f, 0.0f, newSize.width, newSize.height)];
 	UIImage* scaledImage = UIGraphicsGetImageFromCurrentImageContext();
 	UIGraphicsEndImageContext();
@@ -124,7 +116,7 @@
             
     }
     
-    UIGraphicsBeginImageContext(bounds.size);
+    UIGraphicsBeginImageContextWithOptions(bounds.size, NO, 0.0);
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     if ((orient == UIImageOrientationDown) || (orient == UIImageOrientationRight) || (orient == UIImageOrientationUp)){
